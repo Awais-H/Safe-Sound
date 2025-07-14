@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Decibel Audio Tracker",
+  "version": "1.0",
+  "description": "Tracks video player audio levels and shows weekly exposure in OSHA decibel buckets.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "Decibel Tracker",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
