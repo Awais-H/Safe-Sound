@@ -1,84 +1,198 @@
-document.getElementById('startBtn').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, 'START_TRACKING');
-  });
+// Popup script for Safe Sound extension
+// This creates a simple popup interface that works with Chrome extensions
+
+// Import utility functions
+import('./utils.js').then(({ getOSHALimit, getExposureColor, getExposureBarColor, getFullDayName }) => {
+  // Create a simple popup interface
+  const root = document.getElementById('root');
+  if (root) {
+    root.innerHTML = `
+      <div class="popup-container">
+        <div class="header">
+          <h1>Safe Sound</h1>
+          <p>System Audio Level Monitor</p>
+          <button id="monitorBtn" class="monitor-btn">Loading...</button>
+          <div id="status" class="status"></div>
+        </div>
+        
+        <div class="content">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="levels">Levels</button>
+            <button class="tab-btn" data-tab="time">Time</button>
+          </div>
+          
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="day">Day</button>
+            <button class="view-btn" data-view="week">Week</button>
+          </div>
+          
+          <div id="dataContainer" class="data-container">
+            <div class="loading">Loading data...</div>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>OSHA-Compliant System Audio Monitoring</p>
+          <div class="legend">
+            <span class="legend-item"><span class="dot green"></span>Safe</span>
+            <span class="legend-item"><span class="dot yellow"></span>Caution</span>
+            <span class="legend-item"><span class="dot red"></span>Danger</span>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add event listeners
+    setupEventListeners();
+    
+    // Check monitoring status and update UI
+    updateMonitoringStatus();
+    
+    // Load initial data
+    loadData();
+  }
+}).catch(error => {
+  console.error('Failed to load popup:', error);
+  document.getElementById('root').innerHTML = '<div>Error loading Safe Sound</div>';
 });
 
-document.getElementById('stopBtn').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, 'STOP_TRACKING');
-  });
-});
-
-document.getElementById('weeklyBtn').addEventListener('click', () => {
-  const canvas = document.getElementById('chart');
-  canvas.style.display = 'block';
-  chrome.storage.sync.get(null, data => {
-    const now = new Date();
-    const weekKey = `${now.getUTCFullYear()}W${getWeekNumber(now)}`;
-    const usage = data[weekKey] || {};
-    const labels = [];
-    const values = [];
-    for (let bucket = 10; bucket <= 120; bucket += 10) {
-      labels.push(`${bucket}-${bucket + 9} dB`);
-      values.push((usage[bucket] || 0) / 3600); // seconds -> hours
-    }
-    renderChart(labels, values);
-    // OPTIONAL: send to backend
-    /*
-    fetch('https://your-backend.example.com/usage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ week: weekKey, usage })
+function setupEventListeners() {
+  // Monitor button
+  const monitorBtn = document.getElementById('monitorBtn');
+  monitorBtn.addEventListener('click', toggleMonitoring);
+  
+  // Tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      loadData();
     });
-    */
   });
-});
-
-function getWeekNumber(d) {
-  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  
+  // View buttons
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      loadData();
+    });
+  });
 }
 
-let chart;
-function renderChart(labels, values) {
-  if (chart) chart.destroy();
-  const ctx = document.getElementById('chart').getContext('2d');
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Hours exposure (this week)',
-          data: values
-        },
-        {
-          label: 'OSHA weekly limit (hrs)',
-          data: labels.map(label => {
-            const rangeStart = parseInt(label);
-            const dB = rangeStart + 5; // midpoint
-            let dailyLimitHours = 8 * Math.pow(2, (90 - dB) / 5);
-            if (dailyLimitHours > 24) dailyLimitHours = 24;
-            return dailyLimitHours * 5;
-          })
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Hours'
-          }
-        }
+function updateMonitoringStatus() {
+  const btn = document.getElementById('monitorBtn');
+  const status = document.getElementById('status');
+  
+  // Get current monitoring status from background script
+  chrome.runtime.sendMessage({ action: 'getMonitoringStatus' }, (response) => {
+    if (response && typeof response.isMonitoring === 'boolean') {
+      if (response.isMonitoring) {
+        btn.textContent = 'Stop Monitoring';
+        btn.classList.add('monitoring');
+        status.textContent = '✓ Monitoring system audio output';
+        status.className = 'status active';
+      } else {
+        btn.textContent = 'Start Monitoring';
+        btn.classList.remove('monitoring');
+        status.textContent = '';
+        status.className = 'status';
       }
+    } else {
+      // Default to stopped state if we can't get status
+      btn.textContent = 'Start Monitoring';
+      btn.classList.remove('monitoring');
+      status.textContent = '';
+      status.className = 'status';
     }
   });
+}
+
+function toggleMonitoring() {
+  const btn = document.getElementById('monitorBtn');
+  const status = document.getElementById('status');
+  
+  if (btn.classList.contains('monitoring')) {
+    // Stop monitoring
+    chrome.runtime.sendMessage({ action: 'stopMonitoring' }, (response) => {
+      if (response && response.success) {
+        btn.textContent = 'Start Monitoring';
+        btn.classList.remove('monitoring');
+        status.textContent = '';
+        status.className = 'status';
+      }
+    });
+  } else {
+    // Start monitoring
+    chrome.runtime.sendMessage({ action: 'startMonitoring' }, (response) => {
+      if (response && response.success) {
+        btn.textContent = 'Stop Monitoring';
+        btn.classList.add('monitoring');
+        status.textContent = '✓ Monitoring system audio output';
+        status.className = 'status active';
+      }
+    });
+  }
+}
+
+function loadData() {
+  const container = document.getElementById('dataContainer');
+  const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+  const activeView = document.querySelector('.view-btn.active').dataset.view;
+  
+  container.innerHTML = '<div class="loading">Loading data...</div>';
+  
+  // Get data from storage
+  chrome.storage.local.get(['audioData'], (result) => {
+    const data = result.audioData || [];
+    displayData(data, activeTab, activeView);
+  });
+}
+
+function displayData(data, tab, view) {
+  const container = document.getElementById('dataContainer');
+  
+  if (data.length === 0) {
+    container.innerHTML = '<div class="no-data">No data available. Start monitoring to see results.</div>';
+    return;
+  }
+  
+  // Process data based on tab and view
+  let processedData = [];
+  if (tab === 'levels') {
+    processedData = processLevelsData(data, view);
+  } else {
+    processedData = processTimeData(data, view);
+  }
+  
+  // Display the data
+  container.innerHTML = processedData.map(item => `
+    <div class="data-item">
+      <span class="label">${item.label}</span>
+      <div class="bar-container">
+        <div class="bar ${item.color}" style="width: ${item.width}%"></div>
+      </div>
+      <span class="value ${item.color}">${item.value}</span>
+    </div>
+  `).join('');
+}
+
+function processLevelsData(data, view) {
+  // Simple data processing for demo
+  return [
+    { label: '12AM', value: '45dB', width: 30, color: 'green' },
+    { label: '1AM', value: '52dB', width: 45, color: 'green' },
+    { label: '2AM', value: '85dB', width: 70, color: 'yellow' },
+    { label: '3AM', value: '95dB', width: 85, color: 'red' }
+  ];
+}
+
+function processTimeData(data, view) {
+  // Simple data processing for demo
+  return [
+    { label: '20-40dB', value: '2.5h', width: 25, color: 'green' },
+    { label: '40-60dB', value: '6.2h', width: 60, color: 'green' },
+    { label: '60-80dB', value: '1.8h', width: 18, color: 'yellow' },
+    { label: '80-90dB', value: '0.8h', width: 8, color: 'yellow' }
+  ];
 }
