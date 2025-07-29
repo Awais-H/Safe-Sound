@@ -18,7 +18,7 @@ A Chrome extension that tracks system audio output levels in decibels and provid
 
 - **Frontend**: React, TypeScript, Tailwind CSS
 - **Backend**: Next.js 15, PostgreSQL
-- **Chrome Extension**: Manifest V3
+- **Chrome Extension**: Manifest V2
 - **Audio Processing**: Web Audio API with Screen Capture
 
 ## Prerequisites
