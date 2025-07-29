@@ -17,6 +17,7 @@ A Chrome extension that tracks system audio output levels in decibels and provid
 <p align="left"> 
   <img src="Safe-Sound/assets/demo.png" alt="Demo Photo">
 </p>
+
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Tailwind CSS
