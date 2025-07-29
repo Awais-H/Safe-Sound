@@ -13,7 +13,10 @@ A Chrome extension that tracks system audio output levels in decibels and provid
 - **Interactive Graphs**: Click on days to drill down to hourly data
 - **Backend Integration**: Next.js API with PostgreSQL database
 - **Screen Capture Permission**: Uses Chrome's screen capture API to monitor system audio
-
+<p align="left"> 
+  <img src="assets/demo" alt="Demo Photo">
+</p>
+<h1 align="left">Demo View</h1>
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Tailwind CSS
