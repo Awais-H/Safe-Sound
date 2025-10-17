@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "OSHA-compliant desktop audio monitoring application",
   "main": "main.js",
+  "author": "Your Name",
+  "license": "MIT",
   "scripts": {
     "start": "electron .",
     "dev": "concurrently \"npm run dev:next\" \"npm run dev:backend\" \"npm run dev:electron\"",
@@ -10,9 +12,11 @@
     "dev:backend": "python backend/main.py",
     "dev:electron": "wait-on http://localhost:3000 http://localhost:8000/api/health && electron .",
     "build": "next build",
-    "build:electron": "echo 'Using JavaScript files, no TypeScript compilation needed'",
+    "build:backend": "cd backend && pyinstaller main.spec",
+    "build:all": "npm run build && npm run build:backend",
     "pack": "electron-builder --dir",
-    "dist": "npm run build && electron-builder"
+    "dist": "npm run build:all && electron-builder",
+    "dist:win": "npm run build:all && electron-builder --win"
   },
   "build": {
     "appId": "com.safesound.monitor",
@@ -21,21 +25,45 @@
       "main.js",
       "preload.js",
       "out/**/*",
-      "backend/**/*"
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/dist/safesound-backend.exe",
+        "to": "backend/safesound-backend.exe"
+      }
     ],
     "directories": {
-      "buildResources": "assets"
-    },
-    "mac": {
-      "category": "public.app-category.utilities",
-      "target": "dmg"
+      "buildResources": "assets",
+      "output": "dist"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
-    "linux": {
-      "target": "AppImage",
-      "category": "Utility"
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Safe Sound Monitor"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
     }
   },
   "dependencies": {
