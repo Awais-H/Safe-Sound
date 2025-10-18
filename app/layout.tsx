@@ -5,8 +5,8 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Safe Sound',
-  description: 'OSHA compliant desktop audio monitoring',
+  title: 'Safe Sound Monitor',
+  description: 'OSHA-compliant desktop audio monitoring',
 }
 
 export default function RootLayout({

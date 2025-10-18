@@ -703,7 +703,7 @@ export default function SafeSoundDashboard() {
                 <div className="pt-4 border-t">
                   <p className="text-xs text-gray-500">
                     <strong>Recommended Apps:</strong> Sound Meter (iOS), Decibel X (iOS), Sound Meter (Android), or any
-                    calibrated decibel meter app
+                    calibrated decibel meter app.
                   </p>
                 </div>
               </CardContent>
