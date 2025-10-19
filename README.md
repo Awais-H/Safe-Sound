@@ -1,10 +1,11 @@
 # 🔊 Safe Sound Monitor
 
-**OSHA-compliant desktop audio monitoring application**  
+>**OSHA compliant desktop audio monitoring application**  
 Track and analyze your audio exposure levels to protect your hearing health
+
 **[Download the latest release here!](https://github.com/Awais-H/Safe-Sound/releases/tag/v1.0.0)**
 
-<img width="580" height="799" alt="image" src="https://github.com/user-attachments/assets/6b841bb8-70a5-4371-80f1-8dc8179eebf5" />
+<img width="627" height="913" alt="image" src="https://github.com/user-attachments/assets/e2f99dde-1d09-41b1-b15c-6147a28c4275" />
 
 ---
 
