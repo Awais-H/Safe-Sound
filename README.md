@@ -1,122 +1,88 @@
-# Safe Sound - System Audio Level Monitor Chrome Extension
+# 🔊 Safe Sound Monitor
 
-A Chrome extension that tracks system audio output levels in decibels and provides OSHA-compliant monitoring with visual graphs and alerts.
+> **OSHA-compliant desktop audio monitoring application**  
+> Track and analyze your audio exposure levels to protect your hearing health
+![Safe Sound Monitor Dashboard](<img width="580" height="799" alt="image" src="https://github.com/user-attachments/assets/44566691-dd35-44d2-a16a-60c38682d7f0" />)
 
-## Features
+**[Download the latest release here!](https://github.com/Awais-H/Safe-Sound/releases/tag/v1.0.0)**
 
-- **Real-time System Audio Monitoring**: Tracks audio output levels from 20-130dB
-- **OSHA Compliance**: Color-coded graphs based on OSHA exposure limits
-- **Multiple Views**: 
-  - Daily view with hourly breakdown
-  - Weekly view with daily averages
-  - Time-based analysis by decibel ranges
-- **Interactive Graphs**: Click on days to drill down to hourly data
-- **Backend Integration**: Next.js API with PostgreSQL database
-- **Screen Capture Permission**: Uses Chrome's screen capture API to monitor system audio
-<h2 align="left">Demo View</h2>
-<p align="left"> 
-  <img src="Safe-Sound/assets/demo.png" alt="Demo Photo">
-</p>
 
-## Tech Stack
+---
 
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **Backend**: Next.js 15, PostgreSQL
-- **Chrome Extension**: Manifest V2
-- **Audio Processing**: Web Audio API with Screen Capture
+## ✨ Features ✨
 
-## Prerequisites
+- **Real-time Audio Monitoring** that displays current decibel readings from your system microphone
+- **Local SQLite database** for storing study sessions with hourly readings and time-by-range data
+- **OSHA Compliance Tracking** with color-coded indicators based on exposure limits
+- **Calibration System** for accurate SPL measurements using smartphone meter calibration
+- **Historical Data Analysis** to view hourly, daily, and weekly exposure patterns
 
-- Node.js 18+ 
-- PostgreSQL 12+
-- Chrome browser
+---
 
-## Installation
+## 🛠️ Technologies 🛠️
+
+**Frontend:** Next.js with TypeScript and Tailwind CSS
+
+**Backend:** FastAPI with SQLite database
+
+**Desktop:** Electron for Windows desktop app
+
+---
+
+## 📋 System Requirements
+
+- Windows 10 or later
+- Audio input device (microphone)
+- ~200MB disk space
+
+---
+
+## 🚀 Installation 🚀
 
 ### 1. Clone the repository
+
 ```bash
-git clone <repository-url>
-cd safe-sound-extension
+git clone https://github.com/yourusername/safe-sound-monitor.git
+cd safe-sound-monitor
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
+cd backend && pip install -r requirements.txt && cd ..
 ```
 
-### 3. Set up PostgreSQL database
+### 3. Run the application
 
-Create a new database:
-```sql
-CREATE DATABASE safe_sound;
-```
-
-### 4. Configure environment variables
-
-Create a `.env.local` file in the root directory:
-```env
-# Database Configuration
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=safe_sound
-DB_PASSWORD=your_password
-DB_PORT=5432
-
-# Next.js Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000
-```
-
-### 5. Initialize the database
-
-Run the database initialization script:
-```bash
-node scripts/init-db.js
-```
-
-### 6. Start the development server
 ```bash
 npm run dev
 ```
 
-The backend will be available at `http://localhost:3000`
+This starts the Next.js dev server, FastAPI backend, and Electron window.
 
-### 7. Load the Chrome extension
+---
 
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable "Developer mode" in the top right
-3. Click "Load unpacked" and select the project directory
-4. The extension should now appear in your extensions list
+## 📖 Usage
 
-## Usage
+1. **Calibration:** Use your phone's SPL meter app with test audio to calibrate
+2. **Monitoring:** Real-time decibel readings with OSHA compliance indicators
+3. **History:** View daily/weekly exposure data and time spent in each dB range
+4. **Data Storage:** All data saved locally in SQLite database
 
-### Chrome Extension
+---
 
-1. **Installation**: The extension will request screen capture permissions on first use
-2. **Monitoring**: Click "Start Monitoring" in the popup to begin tracking system audio
-3. **Permissions**: Grant screen capture permission when prompted (this captures system audio output)
-4. **Viewing Data**: Click the extension icon to open the popup with graphs
-5. **Navigation**: 
-   - Toggle between "Levels" and "Time" views
-   - Switch between "Week" and "Day" views
-   - Click on days in weekly view to see hourly breakdown
+## 📊 OSHA Exposure Limits
 
-## Database Schema
+| dB Range | Max Exposure | Status |
+|----------|--------------|--------|
+| 85-94    | 8 hours      | 🟢 Safe |
+| 95-104   | 2-4 hours    | 🟡 Caution |
+| 105+     | <1 hour      | 🔴 Danger |
 
-The main table `audio_data` stores:
-- `id`: Primary key
-- `level`: Decibel level (0-130)
-- `timestamp`: When measurement was taken
-- `hour`: Hour of day (0-23)
-- `day`: Day abbreviation (Mon, Tue, etc.)
-- `created_at`: Record creation time
+---
 
-## OSHA Guidelines
+## 📄 License
 
-The extension follows OSHA exposure limits:
-- 85-89dB: 8 hours
-- 90-94dB: 8 hours  
-- 95-99dB: 4 hours
-- 100-104dB: 2 hours
-- 105-109dB: 1 hour
-- 110-114dB: 30 minutes
-- 115+dB: 15 minutes
+MIT License - see [LICENSE](LICENSE) file for details.
+
