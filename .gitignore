@@ -123,3 +123,6 @@ tmp/
 
 # Lock files
 pnpm-lock.yaml
+
+# Scripts
+fix-paths.js
