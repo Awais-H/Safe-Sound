@@ -4,13 +4,10 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 import json
-
-# Import database utilities
 from db_utils import AudioDatabase
 
 app = FastAPI()
 
-# CORS middleware for Electron app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,11 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize database
 db = AudioDatabase("audio_monitor.db")
 
 
-# Pydantic models
 class CalibrationData(BaseModel):
     spl_reading: float
     dbfs_reading: float
@@ -39,7 +34,6 @@ class CalibrationResponse(BaseModel):
     message: str
 
 
-# Helper function
 def dbfs_to_spl(dbfs: float) -> float:
     """Convert dBFS to SPL using calibration offset"""
     calibration = db.get_latest_calibration()
@@ -47,7 +41,6 @@ def dbfs_to_spl(dbfs: float) -> float:
     return dbfs + offset
 
 
-# API Endpoints
 @app.post("/api/calibration", response_model=CalibrationResponse)
 async def save_calibration(data: CalibrationData):
     """Save calibration data"""
@@ -135,16 +128,10 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             reading_data = json.loads(data)
-
-            # Convert dBFS to SPL
             spl = dbfs_to_spl(reading_data["dbfs"])
-
-            # Send back the SPL value
             await websocket.send_json(
                 {"spl": round(spl, 1), "timestamp": datetime.now().isoformat()}
             )
-
-            # Save to database
             db.save_reading(spl, datetime.now().isoformat())
 
     except WebSocketDisconnect:

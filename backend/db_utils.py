@@ -19,14 +19,12 @@ class AudioDatabase:
         conn = self.get_connection()
         c = conn.cursor()
 
-        # Calibration table
         c.execute("""CREATE TABLE IF NOT EXISTS calibration
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       dbfs_value REAL NOT NULL,
                       spl_value REAL NOT NULL,
                       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)""")
 
-        # Hourly readings table
         c.execute("""CREATE TABLE IF NOT EXISTS hourly_readings
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       timestamp DATETIME NOT NULL,
@@ -36,7 +34,6 @@ class AudioDatabase:
                       duration REAL NOT NULL,
                       date TEXT NOT NULL)""")
 
-        # Daily summary table
         c.execute("""CREATE TABLE IF NOT EXISTS daily_summary
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       date TEXT NOT NULL UNIQUE,
@@ -44,7 +41,6 @@ class AudioDatabase:
                       max_level REAL NOT NULL,
                       total_exposure REAL NOT NULL)""")
 
-        # Time by decibel range table
         c.execute("""CREATE TABLE IF NOT EXISTS time_by_range
                      (date TEXT NOT NULL,
                       range TEXT NOT NULL,
@@ -52,7 +48,6 @@ class AudioDatabase:
                       avg_level REAL NOT NULL,
                       PRIMARY KEY (date, range))""")
 
-        # Create indexes for better query performance
         c.execute("""CREATE INDEX IF NOT EXISTS idx_hourly_date 
                      ON hourly_readings(date)""")
         c.execute("""CREATE INDEX IF NOT EXISTS idx_time_range_date 
@@ -105,7 +100,6 @@ class AudioDatabase:
         conn = self.get_connection()
         c = conn.cursor()
 
-        # Update or insert hourly reading
         c.execute(
             """SELECT id, avg_level, duration, max_level 
                      FROM hourly_readings 
@@ -138,7 +132,6 @@ class AudioDatabase:
                 (timestamp, hour_str, spl, spl, duration_increment, date_str),
             )
 
-        # Update time by range
         db_range = self._get_decibel_range(spl)
         c.execute(
             """SELECT time_hours, avg_level 
@@ -188,7 +181,6 @@ class AudioDatabase:
         results = c.fetchall()
         conn.close()
 
-        # Create 24-hour structure
         hours = [
             f"{i % 12 if i % 12 else 12}{'AM' if i < 12 else 'PM'}" for i in range(24)
         ]
@@ -285,7 +277,6 @@ class AudioDatabase:
         results = c.fetchall()
         conn.close()
 
-        # Ensure all ranges are represented
         ranges = ["20-40dB", "40-60dB", "60-80dB", "80-90dB", "90-100dB", "100+dB"]
         data = []
 
