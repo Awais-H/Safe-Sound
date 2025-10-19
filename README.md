@@ -5,7 +5,7 @@ Track and analyze your audio exposure levels to protect your hearing health
 
 **[Download the latest release here!](https://github.com/Awais-H/Safe-Sound/releases/tag/v1.0.0)**
 
-<img width="627" height="913" alt="image" src="https://github.com/user-attachments/assets/e2f99dde-1d09-41b1-b15c-6147a28c4275" />
+<img width="315" height="457" alt="image" src="https://github.com/user-attachments/assets/e2f99dde-1d09-41b1-b15c-6147a28c4275" />
 
 ---
 
