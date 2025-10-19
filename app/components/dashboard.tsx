@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 
 const BACKEND_URL = 'http://127.0.0.1:8000';
 
-// Helper function to convert day abbreviations to full day names
 const getFullDayName = (dayAbbr: string): string => {
   const dayMap: { [key: string]: string } = {
     Mon: "Monday",
@@ -22,7 +21,6 @@ const getFullDayName = (dayAbbr: string): string => {
   return dayMap[dayAbbr] || dayAbbr
 }
 
-// OSHA exposure limits (in hours) based on decibel levels
 const getOSHALimit = (decibelLevel: number): number => {
   if (decibelLevel < 85) return Number.POSITIVE_INFINITY
   if (decibelLevel < 90) return 8
@@ -34,7 +32,6 @@ const getOSHALimit = (decibelLevel: number): number => {
   return 0.25
 }
 
-// Color coding based on exposure vs OSHA limits
 const getExposureColor = (decibelLevel: number, exposureTime: number): string => {
   if (decibelLevel === 0 || exposureTime === 0) return "text-gray-400"
 
@@ -118,14 +115,12 @@ export default function SafeSoundDashboard() {
   const [calibrationLevel, setCalibrationLevel] = useState("")
   const [isPlaying, setIsPlaying] = useState(false)
 
-  // Data from backend
   const [dailyData, setDailyData] = useState<HourlyData[]>([])
   const [weeklyData, setWeeklyData] = useState<DailyData[]>([])
   const [timeData, setTimeData] = useState<TimeData[]>([])
   const [weeklyTimeData, setWeeklyTimeData] = useState<TimeData[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  // Audio monitoring
   const [isMonitoring, setIsMonitoring] = useState(false)
   const [currentSPL, setCurrentSPL] = useState(0)
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
@@ -133,10 +128,9 @@ export default function SafeSoundDashboard() {
   const [microphone, setMicrophone] = useState<MediaStreamAudioSourceNode | null>(null)
   const [calibrationDbfs, setCalibrationDbfs] = useState<number | null>(null)
 
-  // Fetch data from backend
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 60000) // Refresh every minute
+    const interval = setInterval(fetchData, 60000)
     return () => clearInterval(interval)
   }, [viewMode, selectedDay])
 
@@ -225,7 +219,6 @@ export default function SafeSoundDashboard() {
           const dbfs = getRMSdBFS(dataArray)
           setCalibrationDbfs(dbfs)
 
-          // Keep measuring as long as the audio context exists
           if (ctx.state === 'running') {
             requestAnimationFrame(measureDbfs)
           }
@@ -370,7 +363,6 @@ export default function SafeSoundDashboard() {
 
   return (
     <div className="w-[400px] h-[600px] bg-white flex flex-col">
-      {/* Header */}
       <div className="text-center py-6 border-b">
         <h1 className="text-2xl font-bold text-gray-900">Safe Sound</h1>
         <p className="text-gray-500 text-sm">Desktop Audio Monitor</p>
@@ -379,7 +371,6 @@ export default function SafeSoundDashboard() {
         )}
       </div>
 
-      {/* Tab Navigation */}
       <div className="px-4 py-3 border-b">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
@@ -402,13 +393,10 @@ export default function SafeSoundDashboard() {
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === "Monitor" ? (
           <div className="p-4">
-            {/* Combined Toggle Controls */}
             <div className="flex items-center gap-2 mb-4">
-              {/* Levels/Time Toggle */}
               <div className="flex bg-gray-100 rounded-xl p-1">
                 <button
                   onClick={() => setActiveSubTab("Levels")}
@@ -429,7 +417,6 @@ export default function SafeSoundDashboard() {
               </div>
             </div>
 
-            {/* Data Display */}
             {activeSubTab === "Levels" && (
               <Card>
                 <CardContent className="p-4">
@@ -712,7 +699,6 @@ export default function SafeSoundDashboard() {
         )}
       </div>
 
-      {/* Footer */}
       <div className="p-4 border-t bg-gray-50">
         <div className="text-center space-y-2">
           <p className="text-sm font-medium text-gray-700">OSHA-Compliant Audio Monitoring</p>

@@ -12,22 +12,26 @@
     "dev:backend": "python backend/main.py",
     "dev:electron": "wait-on http://localhost:3000 http://localhost:8000/api/health && electron .",
     "build": "next build",
+    "fix-paths": "node fix-paths.js",
     "build:backend": "cd backend && pyinstaller main.spec",
-    "build:all": "npm run build && npm run build:backend",
+    "build:all": "npm run build && npm run fix-paths && npm run build:backend",
     "clean": "rmdir /s /q dist out .next backend\\dist 2>nul || echo Cleaned build directories",
     "pack": "electron-builder --dir",
     "dist": "npm run clean && npm run build:all && electron-builder",
-    "dist:win": "npm run clean && npm run build:all && electron-builder --win portable"
+    "dist:portable": "npm run clean && npm run build:all && electron-builder --win portable"
   },
   "build": {
     "appId": "com.safesound.monitor",
-    "productName": "SafeSoundMonitor",
+    "productName": "Safe Sound",
     "files": [
       "main.js",
       "preload.js",
       "out/**/*",
       "package.json",
       "!backend/**/*"
+    ],
+    "asarUnpack": [
+      "out/**/*"
     ],
     "extraResources": [
       {
@@ -39,14 +43,9 @@
       "output": "dist"
     },
     "win": {
-      "target": "portable",
+      "target": "nsis",
       "sign": null
-    },
-    "portable": {
-      "artifactName": "${productName}-Portable-${version}.${ext}"
-    },
-    "compression": "normal",
-    "asar": true
+    }
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
