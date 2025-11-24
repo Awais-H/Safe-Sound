@@ -63,10 +63,6 @@ dist_electron/
 *.zip
 *.unpacked/
 
-# Electron source files
-main.js
-preload.js
-
 # Misc
 .DS_Store
 *.pem
